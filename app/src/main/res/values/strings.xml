@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Migration Compose Workshop</string>
+    <string name="add_task">Add Task</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="new_note">New Note</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="update_task">Update Task</string>
 </resources>

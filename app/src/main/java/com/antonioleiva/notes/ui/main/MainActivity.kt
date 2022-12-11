@@ -2,6 +2,7 @@ package com.antonioleiva.notes.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,12 +15,13 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var notesRepository: NotesRepository
+    private val vm: MainViewModel by viewModels {
+        val repository = NotesRepository((application as App).notesDb.notesDao())
+        MainViewModelFactory(repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        notesRepository = NotesRepository((application as App).notesDb.notesDao())
 
         val binding = ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(root)
@@ -27,18 +29,14 @@ class MainActivity : AppCompatActivity() {
 
         val notesAdapter = NotesAdapter(
             onClick = { navigateToDetail(it.id) },
-            onDeleteClick = {
-                lifecycleScope.launch {
-                    notesRepository.delete(it)
-                }
-            }
+            onDeleteClick = vm::delete
         )
 
         binding.notesList.adapter = notesAdapter
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                notesRepository.getAll().collect() {
+                vm.notes.collect() {
                     notesAdapter.submitList(it)
                 }
             }
